@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Buy Me Not",
+  "version": "1.0.0",
+  "description": "AI-powered shopping decision assistant with personal order-history matching.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.amazon.in/*", "https://www.amazon.com/*"],
+      "js": ["orders.js"]
+    },
+    {
+      "matches": ["https://www.amazon.in/*/dp/*", "https://www.amazon.in/dp/*", "https://www.amazon.com/*/dp/*", "https://www.amazon.com/dp/*"],
+      "js": ["product.js"]
+    }
+  ]
+}

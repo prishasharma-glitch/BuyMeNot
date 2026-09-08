@@ -1,0 +1,21 @@
+body { width: 320px; padding: 16px; font-family: Arial, sans-serif; }
+h1 { margin-top: 0; }
+button { width: 100%; padding: 10px; cursor: pointer; margin-bottom: 8px; }
+button.secondary { background: white; border: 1px solid #232F3E; color: #232F3E; }
+#product { margin: 15px 0; }
+#analysis, #personalVerdict { margin-top: 20px; }
+#syncStatus, #personalVerdictResult { font-size: 13px; margin-bottom: 10px; }
+.aspect-card { padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; }
+.aspect-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.aspect-header strong { font-size: 14px; }
+.aspect-header span { font-size: 11px; font-weight: bold; margin-left: 10px; }
+.positive { color: green; }
+.negative { color: red; }
+.neutral { color: #777; }
+.reason { margin: 8px 0; font-size: 13px; line-height: 1.4; }
+.evidence { margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e5e5; font-size: 12px; }
+.evidence ul { margin: 6px 0 0 18px; padding: 0; }
+.evidence li { margin-bottom: 5px; line-height: 1.35; }
+#compatibility { margin-top: 20px; }
+#preferences { margin: 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; }
+#preferences label { font-size: 13px; line-height: 2; }

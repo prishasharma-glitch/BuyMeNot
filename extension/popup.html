@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Buy Me Not</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+  <h1>Buy Me Not</h1>
+
+  <button id="syncBtn" class="secondary">🔄 Sync Order History</button>
+  <p id="syncStatus">Not synced yet.</p>
+
+  <p id="status">Ready to analyze</p>
+
+  <div id="preferences">
+    <h2>Your Requirements</h2>
+    <label><input type="checkbox" id="needsOvenSafe"> Needs oven-safe</label><br>
+    <label><input type="checkbox" id="needsInduction"> Needs induction-compatible</label>
+  </div>
+
+  <div id="product">
+    <p><strong>Product:</strong> <span id="productName">-</span></p>
+    <p><strong>Price:</strong> <span id="productPrice">-</span></p>
+    <p><strong>Rating:</strong> <span id="productRating">-</span></p>
+    <p><strong>Reviews:</strong> <span id="reviewCount">-</span></p>
+    <p><strong>ASIN:</strong> <span id="productAsin">-</span></p>
+  </div>
+
+  <button id="analyzeButton">Analyze Product</button>
+
+  <div id="personalVerdict">
+    <h2>Your Personal Fit Check</h2>
+    <div id="personalVerdictResult">No analysis yet.</div>
+  </div>
+
+  <div id="compatibility">
+    <h2>Compatibility Check</h2>
+    <div id="compatibilityResults">No compatibility check yet.</div>
+  </div>
+
+  <div id="analysis">
+    <h2>AI Review Analysis</h2>
+    <div id="analysisResults">No analysis yet.</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
