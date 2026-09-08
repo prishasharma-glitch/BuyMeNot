@@ -1,5 +1,3 @@
-// ---------- YOUR LOCAL ORDER-HISTORY MATCHING ----------
-
 function extractBrandGuess(title) {
   return title.split(" ").slice(0, 2).join(" ").toLowerCase();
 }
@@ -41,9 +39,9 @@ function renderPersonalVerdict(product) {
     const { riskySignals, safeSignals, matchDetails } = scoreAgainstOrderHistory(product, orders);
     let verdict;
     if (riskySignals > safeSignals) {
-      verdict = `<span class="negative">⚠ Possible regret risk</span> — similar brand items were returned/replaced before.`;
+      verdict = `<span class="negative">&#9888; Possible regret risk</span> &mdash; similar brand items were returned/replaced before.`;
     } else if (safeSignals > 0) {
-      verdict = `<span class="positive">✔ Looks like a safe pick</span> — similar brand items were kept before.`;
+      verdict = `<span class="positive">&#10004; Looks like a safe pick</span> &mdash; similar brand items were kept before.`;
     } else {
       verdict = `No strong match with your past orders.`;
     }
@@ -52,14 +50,12 @@ function renderPersonalVerdict(product) {
   });
 }
 
-// ---------- SYNC BUTTON ----------
-
 function updateSyncStatusDisplay() {
   const el = document.getElementById("syncStatus");
   chrome.storage.local.get("buymenot_orders", (data) => {
     const orders = data.buymenot_orders || [];
     el.textContent = orders.length > 0
-      ? `✔ Synced: ${orders.length} orders saved.`
+      ? `Synced: ${orders.length} orders saved.`
       : "Not synced yet.";
   });
 }
@@ -88,8 +84,6 @@ document.getElementById("syncBtn").addEventListener("click", () => {
   });
 });
 
-// ---------- ANALYZE BUTTON ----------
-
 document.getElementById("analyzeButton").addEventListener("click", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -99,21 +93,15 @@ document.getElementById("analyzeButton").addEventListener("click", async () => {
       return;
     }
 
-    const userRequirements = {
-      needs_oven_safe: document.getElementById("needsOvenSafe").checked,
-      needs_induction: document.getElementById("needsInduction").checked
-    };
-
     document.getElementById("productName").innerText = response.name;
     document.getElementById("productPrice").innerText = response.price;
     document.getElementById("productRating").innerText = response.rating;
     document.getElementById("reviewCount").innerText = response.reviewCount;
     document.getElementById("productAsin").innerText = response.asin;
 
-    // Run your local personal fit check immediately (doesn't need backend)
     renderPersonalVerdict(response);
 
-    const requestData = { ...response, user_requirements: userRequirements };
+    const requestData = { ...response };
 
     try {
       document.getElementById("status").innerText = "Analyzing product...";
@@ -133,26 +121,6 @@ document.getElementById("analyzeButton").addEventListener("click", async () => {
         return;
       }
 
-      // Compatibility
-      const compatibilityResults = document.getElementById("compatibilityResults");
-      compatibilityResults.innerHTML = "";
-      result.compatibility.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "aspect-card";
-        let statusSymbol = "⚠️", statusClass = "neutral";
-        if (item.status === "pass") { statusSymbol = "✅"; statusClass = "positive"; }
-        else if (item.status === "fail") { statusSymbol = "❌"; statusClass = "negative"; }
-        card.innerHTML = `
-          <div class="aspect-header">
-            <strong>${statusSymbol} ${item.requirement}</strong>
-            <span class="${statusClass}">${item.status.toUpperCase()}</span>
-          </div>
-          <p class="reason">${item.message}</p>
-        `;
-        compatibilityResults.appendChild(card);
-      });
-
-      // AI review analysis
       const analysisResults = document.getElementById("analysisResults");
       analysisResults.innerHTML = "";
       result.analysis.aspects.forEach(item => {
@@ -170,17 +138,3 @@ document.getElementById("analyzeButton").addEventListener("click", async () => {
           <p class="reason">${item.reason}</p>
           ${evidenceHTML}
         `;
-        analysisResults.appendChild(card);
-      });
-
-      document.getElementById("status").innerText = "Analysis complete!";
-
-    } catch (error) {
-      console.error("Backend error:", error);
-      document.getElementById("status").innerText = "Could not connect to backend.";
-      document.getElementById("analysisResults").innerText = "Backend is unavailable.";
-    }
-  });
-});
-
-updateSyncStatusDisplay();
