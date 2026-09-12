@@ -1,38 +1,226 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Buy Me Not</title>
-  <link rel="stylesheet" href="popup.css">
+
+    <title>Buy Me Not</title>
+
+    <link
+        rel="stylesheet"
+        href="popup.css"
+    >
+
 </head>
+
+
 <body>
 
-  <h1>Buy Me Not</h1>
+    <h1>Buy Me Not</h1>
 
-  <button id="syncBtn" class="secondary">Sync Order History</button>
-  <p id="syncStatus">Not synced yet.</p>
+    <p id="status">
+        Ready to analyze
+    </p>
 
-  <p id="status">Ready to analyze</p>
 
-  <div id="product">
-    <p><strong>Product:</strong> <span id="productName">-</span></p>
-    <p><strong>Price:</strong> <span id="productPrice">-</span></p>
-    <p><strong>Rating:</strong> <span id="productRating">-</span></p>
-    <p><strong>Reviews:</strong> <span id="reviewCount">-</span></p>
-    <p><strong>ASIN:</strong> <span id="productAsin">-</span></p>
-  </div>
+    <!-- USER PROFILE -->
 
-  <button id="analyzeButton">Analyze Product</button>
+    <div id="userProfile">
 
-  <div id="personalVerdict">
-    <h2>Your Personal Fit Check</h2>
-    <div id="personalVerdictResult">No analysis yet.</div>
-  </div>
+        <h2>Your Profile</h2>
 
-  <div id="analysis">
-    <h2>AI Review Analysis</h2>
-    <div id="analysisResults">No analysis yet.</div>
-  </div>
+        <p>
+            These details help estimate
+            your personalized return risk.
+        </p>
 
-  <script src="popup.js"></script>
+        <input
+            type="number"
+            id="customerAge"
+            placeholder="Age"
+        >
+
+        <input
+            type="number"
+            id="pastPurchaseCount"
+            placeholder="Previous purchases"
+        >
+
+        <input
+            type="number"
+            id="pastReturnRate"
+            placeholder="Previous return rate (0-1)"
+            step="0.01"
+            min="0"
+            max="1"
+        >
+
+        <input
+            type="number"
+            id="sessionLength"
+            placeholder="Session length (minutes)"
+            step="0.1"
+        >
+
+        <input
+            type="number"
+            id="productViews"
+            placeholder="Product views"
+        >
+
+        <input
+            type="text"
+            id="deviceType"
+            placeholder="Device type"
+        >
+
+        <input
+            type="text"
+            id="shippingMethod"
+            placeholder="Shipping method"
+        >
+
+        <input
+            type="text"
+            id="paymentMethod"
+            placeholder="Payment method"
+        >
+
+        <input
+            type="number"
+            id="usedCoupon"
+            placeholder="Used coupon (0 or 1)"
+            min="0"
+            max="1"
+        >
+
+    </div>
+
+
+    <!-- USER REQUIREMENTS -->
+
+    <div id="preferences">
+
+        <h2>Your Requirements</h2>
+
+        <p>
+            Enter requirements that are important
+            to you for this product.
+        </p>
+
+        <input
+            type="text"
+            id="requirementKey"
+            placeholder="Specification"
+        >
+
+        <input
+            type="text"
+            id="requirementValue"
+            placeholder="Required value"
+        >
+
+        <button
+            id="addRequirementButton"
+            type="button"
+        >
+            Add Requirement
+        </button>
+
+        <div id="requirementsList">
+            No requirements added.
+        </div>
+
+    </div>
+
+
+    <!-- PRODUCT INFORMATION -->
+
+    <div id="product">
+
+        <p>
+            <strong>Product:</strong>
+            <span id="productName">-</span>
+        </p>
+
+        <p>
+            <strong>Price:</strong>
+            <span id="productPrice">-</span>
+        </p>
+
+        <p>
+            <strong>Rating:</strong>
+            <span id="productRating">-</span>
+        </p>
+
+        <p>
+            <strong>Reviews:</strong>
+            <span id="reviewCount">-</span>
+        </p>
+
+        <p>
+            <strong>ASIN:</strong>
+            <span id="productAsin">-</span>
+        </p>
+
+        <p>
+            <strong>Specifications:</strong>
+            <span id="productSpecifications">-</span>
+        </p>
+
+    </div>
+
+
+    <!-- ANALYZE BUTTON -->
+
+    <button
+        id="analyzeButton"
+        type="button"
+    >
+        Analyze Product
+    </button>
+
+
+    <!-- COMPATIBILITY -->
+
+    <div id="compatibility">
+
+        <h2>Compatibility Check</h2>
+
+        <div id="compatibilityResults">
+            No compatibility check yet.
+        </div>
+
+    </div>
+
+
+    <!-- FINAL DECISION -->
+
+    <div id="decision">
+
+        <h2>Buy Me Not Decision</h2>
+
+        <div id="decisionResults">
+            No decision yet.
+        </div>
+
+    </div>
+
+
+    <!-- AI ANALYSIS -->
+
+    <div id="analysis">
+
+        <h2>AI Review Analysis</h2>
+
+        <div id="analysisResults">
+            No analysis yet.
+        </div>
+
+    </div>
+
+
+    <script src="popup.js"></script>
+
 </body>
+
 </html>
