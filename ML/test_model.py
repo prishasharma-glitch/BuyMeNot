@@ -1,67 +1,44 @@
+import os
 import joblib
 import pandas as pd
 
+MODEL_PATH = "buy_me_not_pipeline.pkl"
+USER_HISTORY_PATH = "user_history.csv"
 
-# ============================================================
-# LOAD SAVED MODEL
-# ============================================================
+def predict_return_probability(product_data: dict) -> float:
+    pipeline = joblib.load(MODEL_PATH)
+    df = pd.DataFrame([product_data])
+    # Returns the probability of Class 1 (returned)
+    prob = pipeline.predict_proba(df)[0][1]
+    return float(prob)
 
-model = joblib.load("buy_me_not_xgboost.pkl")
-preprocessor = joblib.load("buy_me_not_preprocessor.pkl")
+def log_user_order_outcome(order_data: dict):
+    """
+    Appends a new order outcome (returned=0 or returned=1)
+    to user_history.csv so future training runs include it.
+    """
+    df = pd.DataFrame([order_data])
+    header = not os.path.exists(USER_HISTORY_PATH)
+    df.to_csv(USER_HISTORY_PATH, mode="a", header=header, index=False)
+    print("Logged order outcome to user_history.csv.")
 
-print("Model loaded successfully.")
-print("Preprocessor loaded successfully.")
-
-
-# ============================================================
-# SAMPLE INPUT
-# ============================================================
-
-sample = pd.DataFrame([
-    {
+if __name__ == "__main__":
+    # Test a sample prediction
+    sample_product = {
         "customer_age": 25,
-        "product_price": 50.0,
-        "discount_percent": 20.0,
-        "product_rating": 4.2,
-        "past_purchase_count": 8,
-        "past_return_rate": 0.15,
-        "session_length_minutes": 60.0,
-        "num_product_views": 10,
-        "device_type": "mobile",
-        "product_category": "electronics",
+        "product_price": 49.99,
+        "discount_percent": 15.0,
+        "product_rating": 4.1,
+        "past_purchase_count": 5,
+        "past_return_rate": 0.20,  # Recalculated dynamically per user
+        "session_length_minutes": 12.0,
+        "num_product_views": 4,
+        "device_type": "desktop",
+        "product_category": "clothing",
         "shipping_method": "standard",
         "payment_method": "credit_card",
-        "used_coupon": 0
+        "used_coupon": 1
     }
-])
 
-
-# ============================================================
-# PREPROCESS INPUT
-# ============================================================
-
-sample_processed = preprocessor.transform(sample)
-
-
-# ============================================================
-# MAKE PREDICTION
-# ============================================================
-
-prediction = model.predict(sample_processed)[0]
-
-probability = model.predict_proba(sample_processed)[0][1]
-
-
-# ============================================================
-# DISPLAY RESULT
-# ============================================================
-
-print("\n========== PREDICTION ==========")
-
-print("Return prediction:", int(prediction))
-print("Return probability:", round(float(probability), 4))
-
-if prediction == 1:
-    print("Result: HIGHER RETURN RISK")
-else:
-    print("Result: LOWER RETURN RISK")
+    probability = predict_return_probability(sample_product)
+    print(f"Return Probability: {probability * 100:.2f}%")
