@@ -60,6 +60,12 @@ async function loadUserProfile() {
             );
         }
 
+        // ----------------------------------------------------
+        // UPDATE PURCHASE HISTORY FROM SYNCED AMAZON ORDERS
+        // ----------------------------------------------------
+
+        await updateProfileFromOrderHistory();
+
         Object.keys(profileFields).forEach(
             key => {
 
@@ -83,6 +89,112 @@ async function loadUserProfile() {
 
         console.error(
             "Could not load user profile:",
+            error
+        );
+    }
+}
+
+
+// ============================================================
+// UPDATE PROFILE FROM ORDER HISTORY
+// ============================================================
+
+async function updateProfileFromOrderHistory() {
+
+    try {
+
+        const stored =
+            await chrome.storage.local.get(
+                "buymenot_orders"
+            );
+
+        const orders =
+            stored.buymenot_orders || [];
+
+        if (!Array.isArray(orders) || orders.length === 0) {
+
+            console.log(
+                "No synced order history available."
+            );
+
+            return;
+        }
+
+
+        // ----------------------------------------------------
+        // COUNT PURCHASED PRODUCTS
+        // ----------------------------------------------------
+
+        let purchaseCount = 0;
+        let returnedCount = 0;
+
+        orders.forEach(order => {
+
+            const products =
+                Array.isArray(order.products)
+                    ? order.products
+                    : [];
+
+            products.forEach(product => {
+
+                purchaseCount++;
+
+                if (
+                    product.likelyReturned === true
+                ) {
+
+                    returnedCount++;
+                }
+            });
+        });
+
+
+        // ----------------------------------------------------
+        // CALCULATE RETURN RATE
+        // ----------------------------------------------------
+
+        let returnRate = 0;
+
+        if (purchaseCount > 0) {
+
+            returnRate =
+                returnedCount / purchaseCount;
+        }
+
+
+        // ----------------------------------------------------
+        // UPDATE PROFILE
+        // ----------------------------------------------------
+
+        userProfile.past_purchase_count =
+            purchaseCount.toString();
+
+        userProfile.past_return_rate =
+            returnRate.toFixed(4);
+
+
+        // ----------------------------------------------------
+        // SAVE UPDATED PROFILE
+        // ----------------------------------------------------
+
+        await chrome.storage.local.set({
+            userProfile: userProfile
+        });
+
+
+        console.log(
+            "Profile updated from order history:",
+            {
+                purchaseCount,
+                returnedCount,
+                returnRate
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Could not update profile from order history:",
             error
         );
     }
@@ -148,6 +260,143 @@ Object.keys(profileFields).forEach(
         }
     }
 );
+
+
+// ============================================================
+// ORDER HISTORY SYNC
+// ============================================================
+
+document
+    .getElementById("syncOrdersButton")
+    .addEventListener(
+        "click",
+        async () => {
+
+            const syncStatus =
+                document.getElementById(
+                    "orderSyncStatus"
+                );
+
+            syncStatus.innerText =
+                "Starting order history sync...";
+
+            try {
+
+                const [tab] =
+                    await chrome.tabs.query({
+                        active: true,
+                        currentWindow: true
+                    });
+
+                if (!tab || !tab.id) {
+
+                    syncStatus.innerText =
+                        "Could not find the active tab.";
+
+                    return;
+                }
+
+                chrome.tabs.sendMessage(
+                    tab.id,
+                    {
+                        type: "START_SYNC"
+                    },
+                    async response => {
+
+                        if (
+                            chrome.runtime.lastError
+                        ) {
+
+                            console.error(
+                                "Order sync error:",
+                                chrome.runtime.lastError
+                            );
+
+                            syncStatus.innerText =
+                                "Please open Amazon Your Orders first.";
+
+                            return;
+                        }
+
+                        if (
+                            !response
+                            || !response.ok
+                        ) {
+
+                            if (
+                                response
+                                && response.reason ===
+                                "not_orders_page"
+                            ) {
+
+                                syncStatus.innerText =
+                                    "Please open Amazon Your Orders first.";
+
+                            } else {
+
+                                syncStatus.innerText =
+                                    "Could not start order sync.";
+                            }
+
+                            return;
+                        }
+
+                        syncStatus.innerText =
+                            "Sync started. Please wait...";
+
+                    }
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Order sync failed:",
+                    error
+                );
+
+                syncStatus.innerText =
+                    "Could not start order sync.";
+            }
+        }
+    );
+
+
+// ============================================================
+// CHECK STORED ORDERS
+// ============================================================
+
+async function displayStoredOrderCount() {
+
+    try {
+
+        const stored =
+            await chrome.storage.local.get(
+                "buymenot_orders"
+            );
+
+        const orders =
+            stored.buymenot_orders || [];
+
+        const syncStatus =
+            document.getElementById(
+                "orderSyncStatus"
+            );
+
+        if (orders.length > 0) {
+
+            syncStatus.innerText =
+                `${orders.length} orders synced.`;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Could not load stored orders:",
+            error
+        );
+    }
+}
 
 
 // ============================================================
@@ -871,3 +1120,5 @@ document
 displayRequirements();
 
 loadUserProfile();
+
+displayStoredOrderCount();

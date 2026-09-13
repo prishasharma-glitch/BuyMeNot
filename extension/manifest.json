@@ -28,7 +28,8 @@
                 "https://*.amazon.com/*"
             ],
             "js": [
-                "product.js"
+                "product.js",
+                "orders.js"
             ]
         }
     ]
