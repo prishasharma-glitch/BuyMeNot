@@ -440,6 +440,27 @@ function displayRequirements() {
             </p>
         `;
 
+        const removeButton =
+            document.createElement("button");
+
+        removeButton.type = "button";
+
+        removeButton.innerText = "Remove";
+
+        removeButton.addEventListener(
+            "click",
+            () => {
+
+                delete userRequirements[key];
+
+                displayRequirements();
+            }
+        );
+
+        item.appendChild(
+            removeButton
+        );
+
         requirementsList.appendChild(
             item
         );
