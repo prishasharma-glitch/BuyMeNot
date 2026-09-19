@@ -704,7 +704,7 @@ def generate_compatibility(
     """
     Extract user requirements from the product
     request and compare them against the
-    structured product specifications.
+    structured product specifications and product name.
     """
 
     requirements = product.get(
@@ -724,6 +724,16 @@ def generate_compatibility(
         }
 
     # --------------------------------------------------------
+    # Extract product name / title
+    # --------------------------------------------------------
+
+    product_name = (
+        product.get("name")
+        or product.get("title")
+        or ""
+    )
+
+    # --------------------------------------------------------
     # Run generic compatibility engine
     # --------------------------------------------------------
 
@@ -735,7 +745,10 @@ def generate_compatibility(
                 structured_specifications,
 
             requirements=
-                requirements
+                requirements,
+
+            product_name=
+                product_name
         )
 
         return result

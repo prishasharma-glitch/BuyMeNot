@@ -510,7 +510,15 @@ function getProductInfo() {
             };
 
         });
+    
 
+    // --------------------------------------------------------
+    // USED COUPON
+    // --------------------------------------------------------
+    
+    // Looks for Amazon's standard coupon checkbox
+    const couponElement = document.querySelector('label[for*="coupon"], #vpcButton');
+    const usedCoupon = couponElement ? 1 : 0;
 
     // --------------------------------------------------------
     // RETURN PRODUCT DATA
@@ -519,41 +527,25 @@ function getProductInfo() {
     return {
 
         name,
-
         title: name,
-
         price,
-
-        product_price:
-            productPrice,
-
+        product_price: productPrice,
         rating,
-
-        product_rating:
-            productRating,
-
-        discount_percent:
-            discountPercent,
-
+        product_rating: productRating,
+        discount_percent: discountPercent,
         reviewCount,
-
         asin,
-
         brand,
-
         category,
-
-        product_category:
-            productCategory,
-
+        product_category: productCategory,
         specifications,
-
         reviews,
-
-        url:
-            window.location.href
+        used_coupon: usedCoupon,
+        url: window.location.href
     };
 }
+
+
 
 
 // ============================================================

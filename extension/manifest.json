@@ -7,7 +7,8 @@
     "permissions": [
         "activeTab",
         "storage",
-        "scripting"
+        "scripting",
+        "webNavigation" 
     ],
 
     "host_permissions": [
@@ -15,6 +16,10 @@
         "https://*.amazon.com/*",
         "http://127.0.0.1:8000/*"
     ],
+
+    "background": {
+        "service_worker": "background.js"
+    },
 
     "action": {
         "default_title": "Buy Me Not",

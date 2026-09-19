@@ -41,56 +41,50 @@ const profileFields = {
 // LOAD USER PROFILE
 // ============================================================
 
+// ============================================================
+// LOAD USER PROFILE
+// ============================================================
+
 async function loadUserProfile() {
 
     try {
+        const stored = await chrome.storage.local.get("userProfile");
 
-        const stored =
-            await chrome.storage.local.get(
-                "userProfile"
-            );
-
-        if (
-            stored.userProfile
-        ) {
-
-            Object.assign(
-                userProfile,
-                stored.userProfile
-            );
+        if (stored.userProfile) {
+            Object.assign(userProfile, stored.userProfile);
         }
-
-        // ----------------------------------------------------
-        // UPDATE PURCHASE HISTORY FROM SYNCED AMAZON ORDERS
-        // ----------------------------------------------------
 
         await updateProfileFromOrderHistory();
 
-        Object.keys(profileFields).forEach(
-            key => {
+        // 1. AUTO-DETECT DEVICE TYPE
+        const ua = navigator.userAgent;
+        let deviceType = "desktop";
+        if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) deviceType = "tablet";
+        else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated/i.test(ua)) deviceType = "mobile";
+        
+        userProfile.device_type = deviceType;
 
-                const element =
-                    document.getElementById(
-                        profileFields[key]
-                    );
-
-                if (
-                    element
-                    && userProfile[key] !== ""
-                ) {
-
-                    element.value =
-                        userProfile[key];
-                }
+        // 2. FETCH SESSION DATA FROM BACKGROUND
+        chrome.runtime.sendMessage({ type: "GET_SESSION_DATA" }, (response) => {
+            if (response) {
+                userProfile.session_length_minutes = response.sessionLength;
+                userProfile.num_product_views = response.productViews.toString();
+                
+                // Update DOM elements
+                Object.keys(profileFields).forEach(key => {
+                    const element = document.getElementById(profileFields[key]);
+                    if (element && userProfile[key] !== "") {
+                        element.value = userProfile[key];
+                    }
+                });
+                
+                // Save the newly automated data locally
+                saveUserProfile();
             }
-        );
+        });
 
     } catch (error) {
-
-        console.error(
-            "Could not load user profile:",
-            error
-        );
+        console.error("Could not load user profile:", error);
     }
 }
 
@@ -1004,9 +998,13 @@ document
                             return;
                         }
 
-                        displayProduct(
-                            response
-                        );
+                        // Auto-fill coupon status from the page
+                        if (response.used_coupon !== undefined) {
+                            userProfile.used_coupon = response.used_coupon;
+                            document.getElementById("usedCoupon").value = response.used_coupon;
+                        }
+
+                        displayProduct(response);
 
                         const requestData = {
 

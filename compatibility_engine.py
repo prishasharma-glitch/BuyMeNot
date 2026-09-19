@@ -5,11 +5,12 @@
 
 def check_compatibility(
     specifications,
-    requirements
+    requirements,
+    product_name=""
 ):
     """
-    Compare user requirements against structured
-    product specifications.
+    Compare user requirements against structured product specifications
+    and the product title/name.
 
     Returns:
         compatible: True / False
@@ -19,6 +20,7 @@ def check_compatibility(
 
     violations = []
     checked_requirements = []
+    product_name_lower = (product_name or "").strip().lower()
 
     if not requirements:
         return {
@@ -42,10 +44,26 @@ def check_compatibility(
         )
 
         # ----------------------------------------------------
-        # Requirement does not exist in product specs
+        # 1. Requirement does not exist in product specs table
+        #    Check if it is present in the product name/title
         # ----------------------------------------------------
 
         if requirement_key not in specifications:
+
+            required_str = str(required_value).strip().lower()
+            found_in_title = False
+
+            # Check if required value (e.g., "blue") is in the title
+            if required_str and required_str not in ["true", "yes"]:
+                if required_str in product_name_lower:
+                    found_in_title = True
+            # Or if requirement key itself (e.g., "blue") is in the title
+            elif requirement_key in product_name_lower or requirement.strip().lower() in product_name_lower:
+                found_in_title = True
+
+            if found_in_title:
+                # Satisfied via product name
+                continue
 
             violations.append({
                 "requirement":
@@ -58,8 +76,8 @@ def check_compatibility(
                     None,
 
                 "reason":
-                    "The required specification "
-                    "was not found for this product."
+                    "The required specification was not found in the "
+                    "specifications table or the product title."
             })
 
             continue
@@ -69,7 +87,7 @@ def check_compatibility(
         ]
 
         # ----------------------------------------------------
-        # Boolean requirements
+        # 2. Boolean requirements
         # ----------------------------------------------------
 
         if isinstance(required_value, bool):
@@ -87,12 +105,11 @@ def check_compatibility(
                         actual_value,
 
                     "reason":
-                        "The product does not satisfy "
-                        "the required condition."
+                        "The product does not satisfy the required condition."
                 })
 
         # ----------------------------------------------------
-        # Numeric requirements
+        # 3. Numeric requirements
         # ----------------------------------------------------
 
         elif isinstance(
@@ -117,8 +134,7 @@ def check_compatibility(
                             actual_value,
 
                         "reason":
-                            "The product specification "
-                            "is below the required value."
+                            "The product specification is below the required value."
                     })
 
             except (
@@ -137,12 +153,11 @@ def check_compatibility(
                         actual_value,
 
                     "reason":
-                        "The product specification "
-                        "could not be compared numerically."
+                        "The product specification could not be compared numerically."
                 })
 
         # ----------------------------------------------------
-        # Text requirements
+        # 4. Text requirements (supports partial & title matches)
         # ----------------------------------------------------
 
         else:
@@ -155,22 +170,23 @@ def check_compatibility(
                 actual_value
             ).strip().lower()
 
-            if required_text != actual_text:
+            # Pass if exact match, if required text is inside the spec (e.g. "Shock Blue"),
+            # or if it appears in the product title.
+            if required_text != actual_text and required_text not in actual_text:
+                if required_text not in product_name_lower:
+                    violations.append({
+                        "requirement":
+                            requirement_key,
 
-                violations.append({
-                    "requirement":
-                        requirement_key,
+                        "required":
+                            required_value,
 
-                    "required":
-                        required_value,
+                        "actual":
+                            actual_value,
 
-                    "actual":
-                        actual_value,
-
-                    "reason":
-                        "The product specification "
-                        "does not match the requirement."
-                })
+                        "reason":
+                            "The product specification does not match the requirement."
+                    })
 
     # --------------------------------------------------------
     # Final result
